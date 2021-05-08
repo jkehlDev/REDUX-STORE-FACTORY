@@ -10,7 +10,7 @@ export default class reduxStoreFactory<T> {
     (path, oldState, payload) => {
       return update(path, oldState, payload);
     },
-    this.storeName
+    this.storeName.toUpperCase()
   );
 
   public readonly reset: ResolveReset<T> = buildReset(
@@ -19,7 +19,7 @@ export default class reduxStoreFactory<T> {
     (path, oldState) => {
       return reset(path, oldState, this.initialState);
     },
-    this.storeName
+    this.storeName.toUpperCase()
   );
 
   public execute: { [P: string]: ExecuteAction } = {};
