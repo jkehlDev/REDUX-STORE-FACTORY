@@ -1,6 +1,6 @@
 # REDUX-STORE-FACTORY
 
-Tools library for building redux store
+Tools library for building redux store v1.0.1
 
 ## HOW TO
 
@@ -24,12 +24,12 @@ const data: Data = {
 
 import reduxStoreFactory from "redux-store-factory";
 // Make a redux store factory instance
-const store = new reduxStoreFactory<Data>(data, "test");
+const store = new reduxStoreFactory<Data>(data, "myTestStore");
 
 // Obtain your Resolver:
 const myResolver = store.resolver;
 
-// Obtain you middlware :
+// Obtain you middlware (static) :
 const myMiddleware = reduxStoreFactory.middleware;
 
 // Try action creator for dispatcher to update A.a1:
@@ -52,5 +52,5 @@ store.execute.myAction = new ExecuteAction(
 
 // Get action to dispatch for middleware
 const myPayload = "something cool";
-const myActionTodispacth = store.execute.myAction.create(myPayload);
+const myActionToDispatch = store.execute.myAction.create(myPayload);
 ```
