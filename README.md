@@ -1,6 +1,6 @@
 # REDUX-STORE-FACTORY
 
-Tools library for building redux store v1.0.1
+Tools library for building redux store
 
 ## HOW TO
 
