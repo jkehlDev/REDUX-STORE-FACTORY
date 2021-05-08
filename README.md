@@ -33,14 +33,14 @@ const myResolver = store.resolver;
 const myMiddleware = reduxStoreFactory.middleware;
 
 // Try action creator for dispatcher to update A.a1:
-const myActionUpdateToDispacth = store.update.A.a1("My New Value");
+const myActionUpdateToDispatch = store.update.A.a1("My New Value");
 // OR
-const anOtherActionUpdateToDispacth = store.updata.A({ a1: "My New Value" });
+const anOtherActionUpdateToDispatch = store.update.A({ a1: "My New Value" });
 
 // Try action creator for dispatcher to reset intialSate on A.a1:
-const myActionResetToDispacth = store.reset.A.a1();
+const myActionResetToDispatch = store.reset.A.a1();
 // Try action creator for dispatcher to reset intialSate on A:
-const anOtherActionResetToDispacth = store.reste.A();
+const anOtherActionResetToDispatch = store.reset.A();
 
 // Add action for middleware
 import { ExecuteAction } from "redux-store-factory";
