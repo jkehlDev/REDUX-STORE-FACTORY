@@ -1,4 +1,4 @@
-import reduxStoreFactory from "../../src/index";
+import reduxStoreFactory, { ExecuteAction } from "../../src/index";
 
 interface Data {
   plop: {
@@ -21,7 +21,6 @@ const data2: Data = {
 };
 
 const store = new reduxStoreFactory<Data>(data, "test");
-
 import { expect } from "chai";
 describe("REQUIREMENT - RESOLVER", () => {
   describe("RESOLVER UPDATE", () => {
