@@ -15,7 +15,7 @@ interface Data {
     a2: string;
   };
 }
-const data: Data = {
+const initialState: Data = {
   A: {
     a1: "a1",
     a2: "a2",
@@ -24,7 +24,7 @@ const data: Data = {
 
 import reduxStoreFactory from "redux-store-factory";
 // Make a redux store factory instance
-const store = new reduxStoreFactory<Data>(data, "myTestStore");
+const store = new reduxStoreFactory<Data>(initialState, "myTestStore");
 
 // Obtain your reducer:
 const myReducer = store.reducer;
@@ -37,16 +37,16 @@ const myActionUpdateToDispatch = store.update.A.a1("My New Value");
 // OR
 const anOtherActionUpdateToDispatch = store.update.A({ a1: "My New Value" });
 
-// Try action creator for dispatcher to reset intialSate on A.a1:
+// Try action creator for dispatcher to reset initialState on A.a1:
 const myActionResetToDispatch = store.reset.A.a1();
-// Try action creator for dispatcher to reset intialSate on A:
+// Try action creator for dispatcher to reset initialState on A:
 const anOtherActionResetToDispatch = store.reset.A();
 
 // Add action for middleware
 import { ExecuteAction } from "redux-store-factory";
 store.execute.myAction = new ExecuteAction(
   (store: any) => (next: any) => (action: any) => {
-    console.log("I do something !");
+    console.log(`I do something cool : ${action.payload} !`);
   }
 );
 
