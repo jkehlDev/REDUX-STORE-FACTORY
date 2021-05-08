@@ -1,4 +1,5 @@
-import reduxStoreFactory, { ExecuteAction } from "../../index";
+import ExecuteAction from "../../src/executeAction";
+import reduxStoreFactory from "../../src/index";
 
 interface Data {
   plop: {
@@ -21,9 +22,11 @@ const data2: Data = {
 };
 
 const store = new reduxStoreFactory<Data>(data);
-store.execute.getUser = new ExecuteAction((store, next, action) => {
-  console.log("plopplop");
-});
+store.execute.getUser = new ExecuteAction(
+  (store: any, next: any, action: any) => {
+    console.log("plopplop");
+  }
+);
 
 store.middleware({})((act: any) => {
   console.log(act);
