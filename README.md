@@ -26,8 +26,8 @@ import reduxStoreFactory from "redux-store-factory";
 // Make a redux store factory instance
 const store = new reduxStoreFactory<Data>(data, "myTestStore");
 
-// Obtain your Resolver:
-const myResolver = store.resolver;
+// Obtain your reducer:
+const myReducer = store.reducer;
 
 // Obtain you middlware (static) :
 const myMiddleware = reduxStoreFactory.middleware;
