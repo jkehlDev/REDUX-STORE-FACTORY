@@ -1,4 +1,3 @@
-import ExecuteAction from "../../src/executeAction";
 import reduxStoreFactory from "../../src/index";
 
 interface Data {
@@ -21,7 +20,7 @@ const data2: Data = {
   },
 };
 
-const store = new reduxStoreFactory<Data>(data);
+const store = new reduxStoreFactory<Data>(data, "test");
 
 import { expect } from "chai";
 describe("REQUIREMENT - RESOLVER", () => {

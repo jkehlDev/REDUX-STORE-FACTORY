@@ -13,11 +13,12 @@ export type ResolveUpdate<T> = T extends Array<any> | string | number | Date
 export function buildUpdate<T>(
   path: string[],
   data: T,
-  resolve: (path: string[], oldState: any, payload?: any) => any
+  resolve: (path: string[], oldState: any, payload?: any) => any,
+  storeName: string
 ): ResolveUpdate<T> {
   let item: any = {};
   item.resolve = (payload?: { [Z in keyof T]?: T[Z] }) => ({
-    type: ResolveTypes.UPDATE,
+    type: `${ResolveTypes.UPDATE}_${storeName.toUpperCase}`,
     resolve: (oldState: any) => {
       return resolve([...path], oldState, payload);
     },
@@ -28,10 +29,10 @@ export function buildUpdate<T>(
       if (typeof obj === "object" && !(obj instanceof Array)) {
         const pathTmp = [...path];
         pathTmp.push(key);
-        item[key] = buildUpdate(pathTmp, data[key], resolve);
+        item[key] = buildUpdate(pathTmp, data[key], resolve, storeName);
       } else {
         item[key] = (payload: any) => ({
-          type: ResolveTypes.UPDATE,
+          type: `${ResolveTypes.UPDATE}_${storeName.toUpperCase}`,
           resolve: (oldState: any) => {
             return resolve([...path], oldState, { [key]: payload });
           },

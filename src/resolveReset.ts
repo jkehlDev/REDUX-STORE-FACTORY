@@ -11,11 +11,12 @@ export type ResolveReset<T> = T extends Array<any> | string | number | Date
 export function buildReset<T>(
   path: string[],
   data: T,
-  resolve: (path: string[], oldState: any) => any
+  resolve: (path: string[], oldState: any) => any,
+  storeName: string
 ): ResolveReset<T> {
   let item: any = {};
   item.resolve = () => ({
-    type: ResolveTypes.RESET,
+    type: `${ResolveTypes.RESET}_${storeName.toUpperCase}`,
     resolve: (oldState: any) => {
       return resolve([...path], oldState);
     },
@@ -26,10 +27,10 @@ export function buildReset<T>(
       const pathTmp = [...path];
       pathTmp.push(key);
       if (typeof obj === "object" && !(obj instanceof Array)) {
-        item[key] = buildReset(pathTmp, data[key], resolve);
+        item[key] = buildReset(pathTmp, data[key], resolve, storeName);
       } else {
         item[key] = () => ({
-          type: ResolveTypes.RESET,
+          type: `${ResolveTypes.RESET}_${storeName.toUpperCase}`,
           resolve: (oldState: any) => {
             return resolve(pathTmp, oldState);
           },

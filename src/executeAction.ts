@@ -1,3 +1,5 @@
+import reduxStoreFactory from "./index";
+
 export const EXECUTE_TYPE = "EXECUTE";
 export default class ExecuteAction {
   public readonly type: string = EXECUTE_TYPE;

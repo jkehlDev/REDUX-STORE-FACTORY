@@ -9,7 +9,8 @@ export default class reduxStoreFactory<T> {
     this.initialState,
     (path, oldState, payload) => {
       return update(path, oldState, payload);
-    }
+    },
+    this.storeName
   );
 
   public readonly reset: ResolveReset<T> = buildReset(
@@ -17,30 +18,38 @@ export default class reduxStoreFactory<T> {
     this.initialState,
     (path, oldState) => {
       return reset(path, oldState, this.initialState);
-    }
+    },
+    this.storeName
   );
 
   public execute: { [P: string]: ExecuteAction } = {};
-
-  constructor(public readonly initialState: T) {}
-
-  public reducer(oldState: T = this.initialState, action: any): T {
-    if (
-      action.type === ResolveTypes.RESET ||
-      action.type === ResolveTypes.UPDATE
-    ) {
-      return (action as ResolveAction<any>).resolve({ ...oldState });
+  public reducer: (oldState: T, action: any) => T;
+  public static middleware: (
+    store: any
+  ) => (next: any) => (action: any) => void = (store: any) => (next: any) => (
+    action: any
+  ) => {
+    if (action.type === EXECUTE_TYPE) {
+      action.execute(store, next, action);
+    } else {
+      next(action);
     }
-    return { ...oldState };
-  }
-  
-  public middleware(store: any) {
-    return (next: any) => (action: any) => {
-      if (action.type === EXECUTE_TYPE) {
-        action.execute(store, next, action);
-      } else {
-        next(action);
+  };
+
+  constructor(
+    public readonly initialState: T,
+    public readonly storeName: string
+  ) {
+    this.reducer = (oldState: T = this.initialState, action: any): T => {
+      if (
+        action.type ===
+          `${ResolveTypes.UPDATE}_${this.storeName.toUpperCase}` ||
+        action.type === `${ResolveTypes.RESET}_${this.storeName.toUpperCase}`
+      ) {
+        return (action as ResolveAction<any>).resolve({ ...oldState });
       }
+      return { ...oldState };
     };
   }
 }
+export { default as ExecuteAction, EXECUTE_TYPE } from "./executeAction";
