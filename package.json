@@ -1,0 +1,33 @@
+{
+  "name": "redux-store-factory",
+  "version": "1.0.0",
+  "description": "Tools library for building redux store",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkehlDev/REDUX-STORE-FACTORY.git"
+  },
+  "keywords": [
+    "redux",
+    "store",
+    "factory"
+  ],
+  "author": "jkehlDev",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/jkehlDev/REDUX-STORE-FACTORY/issues"
+  },
+  "homepage": "https://github.com/jkehlDev/REDUX-STORE-FACTORY#readme",
+  "dependencies": {
+    "mocha": "^8.4.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  }
+}
