@@ -16,7 +16,7 @@ export function buildReset<T>(
 ): ResolveReset<T> {
   let item: any = {};
   item.resolve = () => ({
-    type: `${ResolveTypes.RESET}_${storeName.toUpperCase}`,
+    type: `${ResolveTypes.RESET}_${storeName.toUpperCase()}`,
     resolve: (oldState: any) => {
       return resolve([...path], oldState);
     },
@@ -30,7 +30,7 @@ export function buildReset<T>(
         item[key] = buildReset(pathTmp, data[key], resolve, storeName);
       } else {
         item[key] = () => ({
-          type: `${ResolveTypes.RESET}_${storeName.toUpperCase}`,
+          type: `${ResolveTypes.RESET}_${storeName.toUpperCase()}`,
           resolve: (oldState: any) => {
             return resolve(pathTmp, oldState);
           },

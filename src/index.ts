@@ -43,8 +43,8 @@ export default class reduxStoreFactory<T> {
     this.reducer = (oldState: T = this.initialState, action: any): T => {
       if (
         action.type ===
-          `${ResolveTypes.UPDATE}_${this.storeName.toUpperCase}` ||
-        action.type === `${ResolveTypes.RESET}_${this.storeName.toUpperCase}`
+          `${ResolveTypes.UPDATE}_${this.storeName.toUpperCase()}` ||
+        action.type === `${ResolveTypes.RESET}_${this.storeName.toUpperCase()}`
       ) {
         return (action as ResolveAction<any>).resolve({ ...oldState });
       }
