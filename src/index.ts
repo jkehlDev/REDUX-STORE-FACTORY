@@ -1,18 +1,36 @@
-type Action = { type: string; resolve: (oldState?: any) => any };
-type ResolveUpdate<T> = T extends Array<any> | string | number
-  ? (payload: T) => Action
+enum ResolveTypes {
+  UPDATE = "RESOLVE_UPDATE",
+  RESET = "RESOLVE_RESET",
+}
+
+type ResolveAction<T> = {
+  type: T;
+  resolve: (oldState?: any) => any;
+};
+type ResolveUpdate<T> = T extends Array<any> | string | number | Date
+  ? (payload: T) => ResolveAction<ResolveTypes.UPDATE>
   : {
       [P in keyof T | "resolve"]: P extends Exclude<keyof T, "resolve">
         ? ResolveUpdate<T[P]>
-        : (payload: { [Z in keyof T]?: T[Z] }) => Action;
+        : (
+            payload: { [Z in keyof T]?: T[Z] }
+          ) => ResolveAction<ResolveTypes.UPDATE>;
     };
-type ResolveReset<T> = T extends Array<any> | string | number
-  ? () => Action
+type ResolveReset<T> = T extends Array<any> | string | number | Date
+  ? () => ResolveAction<ResolveTypes.RESET>
   : {
       [P in keyof T | "resolve"]: P extends Exclude<keyof T, "resolve">
         ? ResolveReset<T[P]>
-        : () => Action;
+        : () => ResolveAction<ResolveTypes.RESET>;
     };
+const EXECUTE_TYPE = "EXECUTE";
+
+export class ExecuteAction {
+  public readonly type: string = EXECUTE_TYPE;
+  constructor(public execute: (store: any, next: any, action: any) => void) {}
+}
+
+// -------------------------------------------------
 function buildUpdate<T>(
   path: string[],
   data: T,
@@ -20,7 +38,7 @@ function buildUpdate<T>(
 ): ResolveUpdate<T> {
   let item: any = {};
   item.resolve = (payload?: { [Z in keyof T]?: T[Z] }) => ({
-    type: "",
+    type: ResolveTypes.UPDATE,
     resolve: (oldState: any) => {
       return resolve([...path], oldState, payload);
     },
@@ -34,7 +52,7 @@ function buildUpdate<T>(
         item[key] = buildUpdate(pathTmp, data[key], resolve);
       } else {
         item[key] = (payload: any) => ({
-          type: "",
+          type: ResolveTypes.UPDATE,
           resolve: (oldState: any) => {
             return resolve([...path], oldState, { [key]: payload });
           },
@@ -44,6 +62,7 @@ function buildUpdate<T>(
   }
   return item as ResolveUpdate<T>;
 }
+
 function buildReset<T>(
   path: string[],
   data: T,
@@ -51,7 +70,7 @@ function buildReset<T>(
 ): ResolveReset<T> {
   let item: any = {};
   item.resolve = () => ({
-    type: "",
+    type: ResolveTypes.RESET,
     resolve: (oldState: any) => {
       return resolve([...path], oldState);
     },
@@ -65,7 +84,7 @@ function buildReset<T>(
         item[key] = buildReset(pathTmp, data[key], resolve);
       } else {
         item[key] = () => ({
-          type: "",
+          type: ResolveTypes.RESET,
           resolve: (oldState: any) => {
             return resolve(pathTmp, oldState);
           },
@@ -76,8 +95,8 @@ function buildReset<T>(
   return item as ResolveReset<T>;
 }
 
-function cleanAct(path: string[], oldState: any, initialState: any): any {
-  function resolve(
+function reset(path: string[], oldState: any, initialState: any): any {
+  function resolveReset(
     pathArr: string[],
     index: number,
     parentObj: any,
@@ -90,13 +109,13 @@ function cleanAct(path: string[], oldState: any, initialState: any): any {
       ) {
         return {
           ...parentObj,
-          [pathArr[index+1]]: [initialState[pathArr[index + 1]]][0],
+          [pathArr[index + 1]]: [initialState[pathArr[index + 1]]][0],
         };
       } else {
         return {
           ...parentObj,
           [pathArr[index + 1]]: {
-            ...resolve(
+            ...resolveReset(
               pathArr,
               index + 1,
               parentObj[pathArr[index + 1]],
@@ -111,11 +130,11 @@ function cleanAct(path: string[], oldState: any, initialState: any): any {
       ...initialState,
     };
   }
-  return resolve(path, -1, oldState, initialState);
+  return resolveReset(path, -1, oldState, initialState);
 }
 
-function updateAct(path: string[], oldState: any, payload: any): any {
-  function resolve(
+function update(path: string[], oldState: any, payload: any): any {
+  function resolveUpdate(
     pathArr: string[],
     index: number,
     parentObj: any,
@@ -125,7 +144,7 @@ function updateAct(path: string[], oldState: any, payload: any): any {
       return {
         ...parentObj,
         [pathArr[index + 1]]: {
-          ...resolve(
+          ...resolveUpdate(
             pathArr,
             index + 1,
             parentObj[pathArr[index + 1]],
@@ -139,59 +158,43 @@ function updateAct(path: string[], oldState: any, payload: any): any {
       ...payload,
     };
   }
-  return resolve(path, -1, oldState, payload);
+  return resolveUpdate(path, -1, oldState, payload);
 }
 
 export default class reduxStoreFactory<T> {
-  public update: ResolveUpdate<T> = buildUpdate(
+  public readonly update: ResolveUpdate<T> = buildUpdate(
     [],
     this.initialState,
     (path, oldState, payload) => {
-      return updateAct(path, oldState, payload);
+      return update(path, oldState, payload);
     }
   );
-  public reset: ResolveReset<T> = buildReset(
+  public readonly reset: ResolveReset<T> = buildReset(
     [],
     this.initialState,
     (path, oldState) => {
-      return cleanAct(path, oldState, this.initialState);
+      return reset(path, oldState, this.initialState);
     }
   );
+  public execute: { [P: string]: ExecuteAction } = {};
+
   constructor(public initialState: T) {}
-  public reducer(oldState: T = this.initialState, action: Action): T {
-    return action.resolve({ ...oldState });
+  public reducer(oldState: T = this.initialState, action: any): T {
+    if (
+      action.type === ResolveTypes.RESET ||
+      action.type === ResolveTypes.UPDATE
+    ) {
+      return (action as ResolveAction<any>).resolve({ ...oldState });
+    }
+    return { ...oldState };
   }
   public middleware(store: any) {
     return (next: any) => (action: any) => {
-      next(action);
+      if (action.type === EXECUTE_TYPE) {
+        action.execute(store, next, action);
+      } else {
+        next(action);
+      }
     };
   }
 }
-
-interface Data {
-  plop: {
-    action: string;
-    action2: string;
-  };
-}
-const data: Data = {
-  plop: {
-    action: "plop",
-    action2: "plop2",
-  },
-};
-
-const data2: Data = {
-  plop: {
-    action: "ZZ",
-    action2: "ZZ",
-  },
-};
-
-const store = new reduxStoreFactory<Data>(data);
-console.log(store.update.plop.action2("hehe").resolve(store.initialState));
-console.log(
-  store.update.plop.resolve({ action: "hehe" }).resolve(store.initialState)
-);
-console.log(store.reset.plop.resolve().resolve(data2));
-console.log(store.reset.plop.action2().resolve(data2));
