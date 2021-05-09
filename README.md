@@ -29,7 +29,7 @@ const store = new reduxStoreFactory<Data>(initialState, "myTestStore");
 // Obtain your reducer:
 const myReducer = store.reducer;
 
-// Obtain you middlware (static) :
+// Obtain your middlware (static) :
 const myMiddleware = reduxStoreFactory.middleware;
 
 // Try action creator for dispatcher to update A.a1:
