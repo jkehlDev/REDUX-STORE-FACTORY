@@ -1,6 +1,11 @@
 import { ResolveAction, ResolveTypes } from "./resolveAction";
 
-export type ResolveReset<T> = T extends Array<any> | string | number | Date
+export type ResolveReset<T> = T extends
+  | Array<any>
+  | string
+  | number
+  | Date
+  | Function
   ? () => ResolveAction<ResolveTypes.RESET>
   : {
       [P in keyof T | "resolve"]: P extends Exclude<keyof T, "resolve">
@@ -26,7 +31,12 @@ export function buildReset<T>(
       const obj = data[key];
       const pathTmp = [...path];
       pathTmp.push(key);
-      if (typeof obj === "object" && !(obj instanceof Array)) {
+      if (
+        typeof obj === "object" &&
+        !(obj instanceof Array) &&
+        !(obj instanceof Date) &&
+        !(obj instanceof Function)
+      ) {
         item[key] = buildReset(pathTmp, data[key], resolve, storeName);
       } else {
         item[key] = () => ({
@@ -51,6 +61,8 @@ export function reset(path: string[], oldState: any, initialState: any): any {
     if (pathArr.length > index + 1) {
       if (
         initialState[pathArr[index + 1]] instanceof Array ||
+        initialState[pathArr[index + 1]] instanceof Date ||
+        initialState[pathArr[index + 1]] instanceof Function ||
         typeof initialState[pathArr[index + 1]] !== "object"
       ) {
         return {

@@ -1,6 +1,11 @@
 import { ResolveAction, ResolveTypes } from "./resolveAction";
 
-export type ResolveUpdate<T> = T extends Array<any> | string | number | Date
+export type ResolveUpdate<T> = T extends
+  | Array<any>
+  | string
+  | number
+  | Date
+  | Function
   ? (payload: T) => ResolveAction<ResolveTypes.UPDATE>
   : {
       [P in keyof T | "resolve"]: P extends Exclude<keyof T, "resolve">
@@ -26,7 +31,12 @@ export function buildUpdate<T>(
   for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const obj = data[key];
-      if (typeof obj === "object" && !(obj instanceof Array)) {
+      if (
+        typeof obj === "object" &&
+        !(obj instanceof Array) &&
+        !(obj instanceof Date) &&
+        !(obj instanceof Function)
+      ) {
         const pathTmp = [...path];
         pathTmp.push(key);
         item[key] = buildUpdate(pathTmp, data[key], resolve, storeName);
