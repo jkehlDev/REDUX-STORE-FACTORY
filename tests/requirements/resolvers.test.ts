@@ -1,4 +1,4 @@
-import reduxStoreFactory, { ExecuteAction } from "../../src/index";
+import reduxStoreFactory from "../../src/index";
 
 interface Data {
   plop: {

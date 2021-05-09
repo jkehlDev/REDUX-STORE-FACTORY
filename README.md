@@ -35,12 +35,12 @@ const myMiddleware = reduxStoreFactory.middleware;
 // Try action creator for dispatcher to update A.a1:
 const myActionUpdateToDispatch = store.update.A.a1("My New Value");
 // OR
-const anOtherActionUpdateToDispatch = store.update.A({ a1: "My New Value" });
+const anOtherActionUpdateToDispatch = store.update.A.resolve({ a1: "My New Value" });
 
 // Try action creator for dispatcher to reset initialState on A.a1:
 const myActionResetToDispatch = store.reset.A.a1();
 // Try action creator for dispatcher to reset initialState on A:
-const anOtherActionResetToDispatch = store.reset.A();
+const anOtherActionResetToDispatch = store.reset.A.resolve();
 
 // Add action for middleware
 import { ExecuteAction } from "redux-store-factory";
