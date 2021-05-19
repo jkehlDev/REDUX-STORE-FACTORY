@@ -1,6 +1,6 @@
 {
   "name": "redux-store-factory",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Tools library for building redux store",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
